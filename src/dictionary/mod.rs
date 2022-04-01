@@ -32,7 +32,7 @@ use crate::index::MnemonicIndex;
 /// Errors associated to a given language/dictionary
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct WordNotFound {
-    word_searched: String,
+    pub word_searched: String,
 }
 
 impl fmt::Display for WordNotFound {

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::bits;
 use super::index::*;
 use super::mnemonics::*;
@@ -19,6 +21,27 @@ pub enum EntropyError {
     },
     ChecksumInvalid,
 }
+
+impl fmt::Display for EntropyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidParameters {
+                checksum_bits,
+                total_bits,
+                words,
+            } => {
+                write!(
+                    f,
+                    "Invalid Parameters checksum-bits={}, total-bits={}, words={}",
+                    checksum_bits, total_bits, words
+                )
+            }
+            Self::ChecksumInvalid => write!(f, "Invalid Checksum"),
+        }
+    }
+}
+
+impl std::error::Error for EntropyError {}
 
 impl<const N: usize> Entropy<N> {
     /// generate entropy using the given random generator.

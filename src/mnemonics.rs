@@ -1,5 +1,6 @@
 use super::dictionary;
 use super::index::MnemonicIndex;
+use std::fmt;
 
 /// Language agnostic mnemonic phrase representation.
 ///
@@ -39,6 +40,24 @@ pub enum MnemonicError {
         got_words: usize,
     },
 }
+
+impl fmt::Display for MnemonicError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::WordError { index, err } => write!(f, "at {}: {}", index, err),
+            Self::InvalidWords {
+                expected_words,
+                got_words,
+            } => write!(
+                f,
+                "Invalid number of words, expecting {} but got {}",
+                expected_words, got_words
+            ),
+        }
+    }
+}
+
+impl std::error::Error for MnemonicError {}
 
 impl<const W: usize> Mnemonics<W> {
     pub const BITS: usize = W * 11;
