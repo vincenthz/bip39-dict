@@ -1,3 +1,9 @@
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
 #[allow(dead_code)]
 const NUM_BITS_PER_BLOCK: usize = 11;
 

@@ -9,6 +9,11 @@
 //! The output size and the number of iteration are both configurable,
 //! and the original BIP39 values are iteration=2048 and output-size=64 bytes.
 
+#[cfg(feature = "std")]
+use std::vec::Vec;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
 use cryptoxide::hmac::Hmac;
 use cryptoxide::pbkdf2::pbkdf2;
 use cryptoxide::sha2::Sha512;

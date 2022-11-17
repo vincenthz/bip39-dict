@@ -1,9 +1,19 @@
-use std::fmt;
-
 use super::bits;
 use super::index::*;
 use super::mnemonics::*;
 use cryptoxide::hashing::sha2::Sha256;
+
+#[cfg(not(feature = "std"))]
+use {
+    alloc::vec::Vec,
+    core::fmt,
+};
+#[cfg(feature = "std")]
+use {
+    std::vec::Vec,
+    std::error::Error,
+    std::fmt,
+};
 
 /// Entropy is a random piece of data
 ///
@@ -41,7 +51,8 @@ impl fmt::Display for EntropyError {
     }
 }
 
-impl std::error::Error for EntropyError {}
+#[cfg(feature = "std")]
+impl Error for EntropyError {}
 
 impl<const N: usize> Entropy<N> {
     /// generate entropy using the given random generator.
