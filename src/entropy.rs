@@ -168,6 +168,7 @@ impl<const N: usize> Entropy<N> {
     /// let mnemonics = entropy.to_mnemonics::<12, 4>()
     /// 	.expect("correct value of words/checksum for 16 bytes entropy")
     ///     .to_string(&ENGLISH);
+    /// assert_eq!(mnemonics, "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
     /// ```
     ///
     pub fn to_mnemonics<const W: usize, const CS: usize>(
