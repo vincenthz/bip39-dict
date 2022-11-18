@@ -32,9 +32,9 @@ use {
 
 #[cfg(feature = "std")]
 use {
-    std::string::{String, ToString},
     std::error::Error,
     std::fmt,
+    std::string::{String, ToString},
 };
 
 use crate::index::MnemonicIndex;

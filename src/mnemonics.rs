@@ -1,16 +1,9 @@
 use super::dictionary;
 use super::index::MnemonicIndex;
 #[cfg(not(feature = "std"))]
-use {
-    alloc::string::String,
-    core::fmt,
-};
+use {alloc::string::String, core::fmt};
 #[cfg(feature = "std")]
-use {
-    std::string::String,
-    std::fmt,
-    std::error::Error,
-};
+use {std::error::Error, std::fmt, std::string::String};
 
 /// Language agnostic mnemonic phrase representation.
 ///

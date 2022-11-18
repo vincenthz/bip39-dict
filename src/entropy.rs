@@ -4,16 +4,9 @@ use super::mnemonics::*;
 use cryptoxide::hashing::sha2::Sha256;
 
 #[cfg(not(feature = "std"))]
-use {
-    alloc::vec::Vec,
-    core::fmt,
-};
+use {alloc::vec::Vec, core::fmt};
 #[cfg(feature = "std")]
-use {
-    std::vec::Vec,
-    std::error::Error,
-    std::fmt,
-};
+use {std::error::Error, std::fmt, std::vec::Vec};
 
 /// Entropy is a random piece of data
 ///
