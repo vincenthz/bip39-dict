@@ -3,6 +3,8 @@ use super::*;
 extern crate unicode_normalization;
 use self::unicode_normalization::UnicodeNormalization;
 
+use alloc::string::String;
+
 #[test]
 fn mnemonic_zero() {
     // 128 bits
