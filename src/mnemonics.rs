@@ -1,6 +1,16 @@
 use super::dictionary;
 use super::index::MnemonicIndex;
-use std::fmt;
+#[cfg(not(feature = "std"))]
+use {
+    alloc::string::String,
+    core::fmt,
+};
+#[cfg(feature = "std")]
+use {
+    std::string::String,
+    std::fmt,
+    std::error::Error,
+};
 
 /// Language agnostic mnemonic phrase representation.
 ///
@@ -57,7 +67,8 @@ impl fmt::Display for MnemonicError {
     }
 }
 
-impl std::error::Error for MnemonicError {}
+#[cfg(feature = "std")]
+impl Error for MnemonicError {}
 
 impl<const W: usize> Mnemonics<W> {
     pub const BITS: usize = W * 11;

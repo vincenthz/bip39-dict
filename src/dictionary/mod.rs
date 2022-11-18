@@ -7,7 +7,6 @@
 //! Due to keeping the depedencies as small as possible, we do not
 //! support UTF8 NFKD by default. Users must be sure to compose (or decompose)
 //! our output (or input) UTF8 strings.
-
 #[cfg(feature = "cjk")]
 mod chinese_simplified;
 #[cfg(feature = "cjk")]
@@ -25,7 +24,18 @@ mod korean;
 #[cfg(feature = "latin")]
 mod spanish;
 
-use std::{error, fmt};
+#[cfg(not(feature = "std"))]
+use {
+    alloc::string::{String, ToString},
+    core::fmt,
+};
+
+#[cfg(feature = "std")]
+use {
+    std::string::{String, ToString},
+    std::error::Error,
+    std::fmt,
+};
 
 use crate::index::MnemonicIndex;
 
@@ -41,7 +51,8 @@ impl fmt::Display for WordNotFound {
     }
 }
 
-impl error::Error for WordNotFound {}
+#[cfg(feature = "std")]
+impl Error for WordNotFound {}
 
 /// trait to represent the the properties that needs to be associated to
 /// a given language and its dictionary of known mnemonic words.
