@@ -206,11 +206,13 @@ where
     }
 }
 
+#[cfg(test)]
 pub struct BitReaderBy11<'a> {
     buffer: &'a [u8],
     state: ReadState,
 }
 
+#[cfg(test)]
 impl<'a> BitReaderBy11<'a> {
     pub fn new(bytes: &'a [u8]) -> Self {
         BitReaderBy11 {
@@ -249,8 +251,6 @@ impl<'a> BitReaderBy11<'a> {
 mod test {
     use super::*;
 
-    use alloc::vec::Vec;
-
     const WORDS: &'static [u16] = &[
         0b000_0000_0001,
         0b000_0000_0001,
@@ -270,7 +270,7 @@ mod test {
         0b100_0000_0001,
     ];
 
-    const BYTES: &'static [u8] = &[
+    const BYTES: [u8; 22] = [
         0b0000_0000, // 0   - 0
         0b0010_0000, // 8   - 0 (8)
         0b0000_0100, // 16  - 1 (5)
@@ -297,8 +297,12 @@ mod test {
 
     #[test]
     fn bit_write_by_11() {
-        let mut bytes = Vec::new();
-        let emit = |b: u8| bytes.push(b);
+        let mut bytes = [0; BYTES.len()];
+        let mut bytes_pos = 0;
+        let emit = |b: u8| {
+            bytes[bytes_pos] = b;
+            bytes_pos += 1;
+        };
         let mut writer = BitWriterBy11::new(emit);
         for w in WORDS {
             writer.write(*w)
@@ -310,7 +314,7 @@ mod test {
 
     #[test]
     fn bit_read_by_11() {
-        let mut reader = BitReaderBy11::new(BYTES);
+        let mut reader = BitReaderBy11::new(&BYTES);
 
         for (ith, w) in WORDS.iter().enumerate() {
             let word = reader.read();
