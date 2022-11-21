@@ -92,7 +92,7 @@ impl WriteState {
 // 10           + 8 => 1*11          + 7          => S7
 //
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-enum ReadState {
+pub(crate) enum ReadState {
     S0,
     S1(u16),
     S2(u16),
@@ -106,7 +106,13 @@ enum ReadState {
     S10(u16),
 }
 
-enum NextRead {
+impl Default for ReadState {
+    fn default() -> Self {
+        ReadState::S0
+    }
+}
+
+pub(crate) enum NextRead {
     Zero(ReadState),
     One(u16, ReadState),
 }
