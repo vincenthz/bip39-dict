@@ -4,9 +4,9 @@ use super::mnemonics::*;
 use cryptoxide::hashing::sha2::Sha256;
 
 #[cfg(not(feature = "std"))]
-use {alloc::vec::Vec, core::fmt};
+use core::fmt;
 #[cfg(feature = "std")]
-use {std::error::Error, std::fmt, std::vec::Vec};
+use {std::error::Error, std::fmt};
 
 /// Entropy is a random piece of data
 ///
@@ -187,17 +187,32 @@ impl<const N: usize> Entropy<N> {
                 words: W,
             });
         }
-        use bits::BitReaderBy11;
+        use bits::{NextRead, ReadState};
 
-        let mut combined = Vec::from(self.as_ref());
-        combined.extend_from_slice(&self.full_checksum_data());
+        let checksum = self.full_checksum_data();
 
-        let mut reader = BitReaderBy11::new(&combined);
+        let mut state = ReadState::default();
+        let mut read_pos = 0;
+        let mut write_pos = 0;
 
         let mut words = [MnemonicIndex(0); W];
-        for i in 0..W {
-            let n = reader.read();
-            words[i] = MnemonicIndex::new(n).unwrap();
+        while write_pos < W {
+            let next_byte = if read_pos >= N {
+                checksum[read_pos - N]
+            } else {
+                self.0[read_pos]
+            };
+            read_pos += 1;
+            match state.read8(next_byte) {
+                NextRead::Zero(next_state) => {
+                    state = next_state;
+                }
+                NextRead::One(n, next_state) => {
+                    words[write_pos] = MnemonicIndex::new(n).unwrap();
+                    write_pos += 1;
+                    state = next_state;
+                }
+            }
         }
 
         Ok(Mnemonics::<W>::from(words))
