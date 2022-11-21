@@ -110,21 +110,32 @@ impl<const N: usize> Entropy<N> {
         }
         use bits::BitWriterBy11;
 
-        let mut to_validate = BitWriterBy11::new();
+        let mut entropy = [0u8; N];
+        let mut entropy_writer_pos = 0;
+        let mut checksum_data = [0u8; 256];
+
+        // emit the byte to entropy for the N first byte, then to the checksum_data
+        let emit = |b: u8| {
+            if entropy_writer_pos >= N {
+                checksum_data[entropy_writer_pos - N] = b;
+            } else {
+                entropy[entropy_writer_pos] = b;
+            }
+            entropy_writer_pos += 1;
+        };
+        let mut to_validate = BitWriterBy11::new(emit);
         for mnemonic in mnemonics.indices() {
             to_validate.write(mnemonic.0);
         }
+        to_validate.finalize();
 
-        let mut entropy = [0u8; N];
-        let r = to_validate.to_bytes();
-        entropy.copy_from_slice(&r[0..N]);
         let ret = Self(entropy);
 
         // check the checksum got from the mnemonics, from the one calculated
         // from the entropy generated
         let expected_checksum = ret.full_checksum_data();
         if CS > 0 {
-            let checksum_data = &r[N..]; // checksum data computed is in r, after the N bytes of entropy
+            let checksum_data = &checksum_data[0..(entropy_writer_pos - N)];
             let mut rem = CS;
             let mut ofs = 0;
             while rem > 0 {
