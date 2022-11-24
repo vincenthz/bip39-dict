@@ -67,7 +67,8 @@
 
 #![no_std]
 
-#[cfg(feature = "std")]
+#[cfg(test)]
+#[macro_use]
 extern crate std;
 
 #[cfg(not(feature = "std"))]
