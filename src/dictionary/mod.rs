@@ -75,6 +75,7 @@ pub trait Language {
 pub struct DefaultDictionary {
     pub words: [&'static str; 2048],
     pub name: &'static str,
+    pub ordered: bool,
 }
 impl Language for DefaultDictionary {
     fn name(&self) -> &'static str {
@@ -84,17 +85,26 @@ impl Language for DefaultDictionary {
         " "
     }
     fn lookup_mnemonic(&self, word: &str) -> Result<MnemonicIndex, WordNotFound> {
-        match self.words.iter().position(|x| x == &word) {
-            None => Err(WordNotFound {
-                word_searched: word.to_string(),
-            }),
-            Some(v) => {
-                Ok(
-                    // it is safe to call unwrap as we guarantee that the
-                    // returned index `v` won't be out of bound for a
-                    // `MnemonicIndex` (DefaultDictionary.words is an array of 2048 elements)
-                    MnemonicIndex::new(v as u16).unwrap(),
-                )
+        if self.ordered {
+            match self.words.binary_search(&word) {
+                Ok(v) => Ok(MnemonicIndex::new(v as u16).unwrap()),
+                Err(_) => Err(WordNotFound {
+                    word_searched: word.to_string(),
+                }),
+            }
+        } else {
+            match self.words.iter().position(|x| x == &word) {
+                None => Err(WordNotFound {
+                    word_searched: word.to_string(),
+                }),
+                Some(v) => {
+                    Ok(
+                        // it is safe to call unwrap as we guarantee that the
+                        // returned index `v` won't be out of bound for a
+                        // `MnemonicIndex` (DefaultDictionary.words is an array of 2048 elements)
+                        MnemonicIndex::new(v as u16).unwrap(),
+                    )
+                }
             }
         }
     }
@@ -111,6 +121,7 @@ impl Language for DefaultDictionary {
 pub const ENGLISH: DefaultDictionary = DefaultDictionary {
     words: english::WORDS,
     name: "english",
+    ordered: true,
 };
 
 /// default French dictionary as provided by the
@@ -120,6 +131,7 @@ pub const ENGLISH: DefaultDictionary = DefaultDictionary {
 pub const FRENCH: DefaultDictionary = DefaultDictionary {
     words: french::WORDS,
     name: "french",
+    ordered: false,
 };
 
 /// default Japanese dictionary as provided by the
@@ -129,6 +141,7 @@ pub const FRENCH: DefaultDictionary = DefaultDictionary {
 pub const JAPANESE: DefaultDictionary = DefaultDictionary {
     words: japanese::WORDS,
     name: "japanese",
+    ordered: false,
 };
 
 /// default Korean dictionary as provided by the
@@ -138,6 +151,7 @@ pub const JAPANESE: DefaultDictionary = DefaultDictionary {
 pub const KOREAN: DefaultDictionary = DefaultDictionary {
     words: korean::WORDS,
     name: "korean",
+    ordered: true,
 };
 
 /// default chinese simplified dictionary as provided by the
@@ -147,6 +161,7 @@ pub const KOREAN: DefaultDictionary = DefaultDictionary {
 pub const CHINESE_SIMPLIFIED: DefaultDictionary = DefaultDictionary {
     words: chinese_simplified::WORDS,
     name: "chinese-simplified",
+    ordered: false,
 };
 /// default chinese traditional dictionary as provided by the
 /// [BIP39 standard](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md#chinese)
@@ -155,6 +170,7 @@ pub const CHINESE_SIMPLIFIED: DefaultDictionary = DefaultDictionary {
 pub const CHINESE_TRADITIONAL: DefaultDictionary = DefaultDictionary {
     words: chinese_traditional::WORDS,
     name: "chinese-traditional",
+    ordered: false,
 };
 
 /// default italian dictionary as provided by the
@@ -164,6 +180,7 @@ pub const CHINESE_TRADITIONAL: DefaultDictionary = DefaultDictionary {
 pub const ITALIAN: DefaultDictionary = DefaultDictionary {
     words: italian::WORDS,
     name: "italian",
+    ordered: true,
 };
 
 /// default spanish dictionary as provided by the
@@ -173,4 +190,43 @@ pub const ITALIAN: DefaultDictionary = DefaultDictionary {
 pub const SPANISH: DefaultDictionary = DefaultDictionary {
     words: spanish::WORDS,
     name: "spanish",
+    ordered: false,
 };
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! dict_valid {
+        ($dict:ident) => {{
+            assert_eq!($dict.words.windows(2).all(|w| w[0] <= w[1]), $dict.ordered);
+
+            for (i, word) in $dict.words.iter().enumerate() {
+                assert_eq!(
+                    $dict.lookup_mnemonic(word),
+                    Ok(MnemonicIndex::new(i as u16).unwrap())
+                );
+            }
+        }};
+    }
+
+    #[test]
+    fn dict_valid() {
+        #[cfg(feature = "english")]
+        dict_valid!(ENGLISH);
+
+        #[cfg(feature = "latin")]
+        {
+            dict_valid!(FRENCH);
+            dict_valid!(ITALIAN);
+            dict_valid!(SPANISH);
+        }
+        #[cfg(feature = "cjk")]
+        {
+            dict_valid!(CHINESE_SIMPLIFIED);
+            dict_valid!(CHINESE_TRADITIONAL);
+            dict_valid!(JAPANESE);
+            dict_valid!(KOREAN);
+        }
+    }
+}
