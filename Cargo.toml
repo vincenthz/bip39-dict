@@ -1,6 +1,6 @@
 [package]
 name = "bip39-dict"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Vincent Hanquez <vincent@typed.io>", "Nicolas Di Prima <nicolas@primetype.co.uk>"]
 description = "BIP39 dictionaries with apis to convert between words and binary representation"
