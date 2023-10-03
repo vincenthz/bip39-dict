@@ -42,6 +42,7 @@ use crate::index::MnemonicIndex;
 /// Errors associated to a given language/dictionary
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct WordNotFound {
+    /// The word searched that was not found
     pub word_searched: String,
 }
 
@@ -58,9 +59,16 @@ impl Error for WordNotFound {}
 /// a given language and its dictionary of known mnemonic words.
 ///
 pub trait Language {
+    /// Name of the language as a static string
     fn name(&self) -> &'static str;
+
+    /// Separator used for the language
     fn separator(&self) -> &'static str;
+
+    /// Lookup in the dictionary to find the `MnemonicIndex` of given word, or an error if not found
     fn lookup_mnemonic(&self, word: &str) -> Result<MnemonicIndex, WordNotFound>;
+
+    /// Lookup the word associated with a given `MnemonicIndex`
     fn lookup_word(&self, mnemonic: MnemonicIndex) -> &'static str;
 }
 
@@ -73,10 +81,16 @@ pub trait Language {
 /// [`unicode-normalization`](https://crates.io/crates/unicode-normalization)).
 ///
 pub struct DefaultDictionary {
+    /// dictionary of words
     pub words: [&'static str; 2048],
+
+    /// name of the language
     pub name: &'static str,
+
+    /// Whether or not the dictionary list is correctly ordered related to Ord rules for string
     pub ordered: bool,
 }
+
 impl Language for DefaultDictionary {
     fn name(&self) -> &'static str {
         self.name

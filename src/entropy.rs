@@ -15,13 +15,19 @@ use {std::error::Error, std::fmt};
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct Entropy<const N: usize>(pub [u8; N]);
 
+/// Possible error when trying to create entropy from the mnemonics
 #[derive(Debug, Clone)]
 pub enum EntropyError {
+    /// Invalid parameters when the function is called with mismatching bits
     InvalidParameters {
+        /// number of checksum bits asked
         checksum_bits: usize,
+        /// number of total bits
         total_bits: usize,
+        /// number of words in mnemonics
         words: usize,
     },
+    /// Mismatch in checksum
     ChecksumInvalid,
 }
 
@@ -64,6 +70,9 @@ impl<const N: usize> Entropy<N> {
         Sha256::new().update(&self.0).finalize()
     }
 
+    /// Try to create an entropy object from the slice
+    ///
+    /// if the slice is not the right size, None is returned
     pub fn from_slice(slice: &[u8]) -> Option<Self> {
         if slice.len() == N {
             let mut out = [0u8; N];

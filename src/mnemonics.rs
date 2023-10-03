@@ -32,14 +32,21 @@ impl<const W: usize> From<[MnemonicIndex; W]> for Mnemonics<W> {
     }
 }
 
+/// Error during convertion from string
 #[derive(Debug, Clone)]
 pub enum MnemonicError {
+    /// Invalid Word in mnemonics
     WordError {
+        /// index of the words having an issue
         index: usize,
+        /// the error returned by the dictionary
         err: dictionary::WordNotFound,
     },
+    /// Number of words does not match expectation set by the function
     InvalidWords {
+        /// number of expected words
         expected_words: usize,
+        /// number of words received
         got_words: usize,
     },
 }
@@ -64,6 +71,7 @@ impl fmt::Display for MnemonicError {
 impl Error for MnemonicError {}
 
 impl<const W: usize> Mnemonics<W> {
+    /// Size in bits of each element of mnemonics
     pub const BITS: usize = W * 11;
 
     /// get the mnemonic string representation in the given
@@ -107,6 +115,7 @@ impl<const W: usize> Mnemonics<W> {
         }
     }
 
+    /// Indices iterator for each mnemonic words
     pub fn indices(&self) -> impl Iterator<Item = &MnemonicIndex> {
         self.0.iter()
     }
