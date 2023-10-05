@@ -21,7 +21,7 @@ jobs:
         with:
           command: check
 
-    name: Check no std
+  name: Check no std
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
