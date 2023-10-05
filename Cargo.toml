@@ -2,9 +2,12 @@
 name = "bip39-dict"
 version = "0.1.2"
 edition = "2021"
-authors = ["Vincent Hanquez <vincent@typed.io>", "Nicolas Di Prima <nicolas@primetype.co.uk>"]
+authors = [
+    "Vincent Hanquez <vincent@typed.io>",
+    "Nicolas Di Prima <nicolas@primetype.co.uk>",
+]
 description = "BIP39 dictionaries with apis to convert between words and binary representation"
-keywords = [ "crypto", "bitcoin", "bip39", "mnemonic" ]
+keywords = ["crypto", "bitcoin", "bip39", "mnemonic"]
 homepage = "https://github.com/vincenthz/bip39-dict/"
 repository = "https://github.com/vincenthz/bip39-dict/"
 license = "MIT/Apache-2.0"
@@ -17,7 +20,8 @@ unicode-normalization = "0.1"
 hex = "0.4"
 
 [features]
-default = ["english"]
+default = ["std", "english"]
+std = []
 english = []
 cjk = []
 latin = []

@@ -3,6 +3,7 @@ use super::*;
 extern crate unicode_normalization;
 use self::unicode_normalization::UnicodeNormalization;
 
+#[cfg(not(feature = "std"))]
 use alloc::string::String;
 
 #[test]

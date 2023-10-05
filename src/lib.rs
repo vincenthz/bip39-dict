@@ -65,7 +65,7 @@
 //! ```
 //!
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![deny(missing_docs)]
 
 #[cfg(test)]
